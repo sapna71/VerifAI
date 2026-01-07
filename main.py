@@ -1,25 +1,15 @@
-from src.chunk import chunk_text
-
-def read_novel(path):
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            return f.read()
-    except FileNotFoundError:
-        print(f"File not found: {path}")
-        return ""
+from src.io import load_story, load_backstory
+from src.pipeline import run_pipeline
 
 def main():
-    novel_text = read_novel("data/story_001.txt")
-    chunks = chunk_text(novel_text)
+    story = load_story("data/story_001.txt")
+    backstory = load_backstory("data/backstory_001.txt")
 
-    print("Total characters:", len(novel_text))
-    print("Total chunks:", len(chunks))
+    label, rationale = run_pipeline(story, backstory)
 
-    if chunks:
-        print("\nSample chunk ID:", chunks[0]["id"])
-        print("Sample chunk text:\n", chunks[0]["text"][:300])
-    else:
-        print("\nNo chunks created — check story file content.")
+    print("Prediction:", label)
+    if rationale:
+        print("Rationale:", rationale)
 
 if __name__ == "__main__":
     main()
