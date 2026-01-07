@@ -1,47 +1,69 @@
+# src/judge.py
+
+"""
+Judging module for verifying consistency between
+character backstory and retrieved story evidence.
+"""
+
 from transformers import pipeline
 
-nli = pipeline(
-    "text-classification",
-    model="roberta-large-mnli",
-    return_all_scores=True
-)
 
-def contradiction_score(premise, hypothesis):
+def judge_consistency(backstory_text, retrieved_chunks):
     """
-    Returns probability of contradiction
+    Judge whether the story is consistent with the backstory.
+
+    Returns:
+        label (int): 1 if consistent, 0 if inconsistent
+        rationale (str)
     """
-    results = nli(f"{premise} </s></s> {hypothesis}")[0]
-    for r in results:
-        if r["label"].lower() == "contradiction":
-            return r["score"]
-    return 0.0
 
+    if not backstory_text or not retrieved_chunks:
+        return 0, "Insufficient information to judge consistency."
 
-def split_into_claims(backstory):
-    return [s.strip() for s in backstory.split(";") if s.strip()]
+    # Combine evidence text
+    evidence_text = " ".join(chunk["text"] for chunk in retrieved_chunks)
 
+    # Load NLI model
+    classifier = pipeline(
+        "text-classification",
+        model="roberta-large-mnli",
+        device=-1  # CPU
+    )
 
-def judge(backstory, retrieved_chunks, contradiction_threshold=0.6):
-    claims = split_into_claims(backstory)
+    # NLI-style input
+    input_text = (
+        f"Premise: {evidence_text}\n"
+        f"Hypothesis: {backstory_text}"
+    )
 
-    violations = []
+    outputs = classifier(input_text)
 
-    for claim in claims:
-        for chunk in retrieved_chunks:
-            if claim not in chunk["matched_claims"]:
-                continue
+    # ---- SAFE OUTPUT HANDLING ----
+    # outputs is usually: [{'label': 'ENTAILMENT', 'score': 0.87}]
+    if isinstance(outputs, list) and isinstance(outputs[0], dict):
+        label_name = outputs[0]["label"]
+        score = outputs[0]["score"]
+    else:
+        return 0, "Unexpected model output format."
 
-            score = contradiction_score(chunk["text"], claim)
+    # Decision logic
+    if label_name == "ENTAILMENT":
+        label = 1
+        rationale = (
+            f"The story is consistent with the backstory "
+            f"(confidence: {score:.2f})."
+        )
+    elif label_name == "CONTRADICTION":
+        label = 0
+        rationale = (
+            f"The story contradicts the backstory "
+            f"(confidence: {score:.2f})."
+        )
+    else:  # NEUTRAL
+        label = 1
+        rationale = (
+            f"The story neither contradicts nor strongly confirms "
+            f"the backstory (confidence: {score:.2f})."
+        )
 
-            if score >= contradiction_threshold:
-                violations.append({
-                    "claim": claim,
-                    "chunk_id": chunk["chunk_id"],
-                    "score": score
-                })
-
-    
-    if len(violations) > 0:
-        return 0  
-
-    return 1  
+    return label, rationale
