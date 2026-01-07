@@ -8,7 +8,8 @@ def main():
     label, rationale = run_pipeline(story, backstory)
 
     print("Prediction:", label)
-    print("Rationale:", rationale)
+    if rationale:
+        print("Rationale:", rationale)
 
 if __name__ == "__main__":
     main()
