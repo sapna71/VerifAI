@@ -5,16 +5,7 @@ import numpy as np
 # Load embedding model once
 _model = SentenceTransformer("all-MiniLM-L6-v2")
 
-
-def retrieve_chunks(story_text, query, top_k=5):
-    """
-    Simple retrieval:
-    - Split story into chunks
-    - Embed chunks
-    - Return top-k most similar chunks (as strings)
-    """
-
-    # Very simple chunking (baseline)
+def build_story_index(story_text):
     words = story_text.split()
     chunk_size = 400
     chunks = [
@@ -22,11 +13,19 @@ def retrieve_chunks(story_text, query, top_k=5):
         for i in range(0, len(words), chunk_size)
     ]
 
-    if not chunks:
-        return []
-
     # Embed
     chunk_embeddings = _model.encode(chunks, convert_to_tensor=True)
+    return chunks, chunk_embeddings
+
+
+def retrieve_chunks(query, chunks, chunk_embeddings, top_k=5):
+    """
+    Simple retrieval:
+    - Split story into chunks
+    - Embed chunks
+    - Return top-k most similar chunks (as strings)
+    """
+
     query_embedding = _model.encode(query, convert_to_tensor=True)
 
     # Similarity
