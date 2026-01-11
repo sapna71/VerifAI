@@ -54,21 +54,33 @@ Our approach follows a **retrieve-and-judge pipeline**:
 ## 🏗️ Project Structure
 
 kdsh_2026/
+
 │
 ├── main.py # Entry point
+
 ├── requirements.txt
+
 ├── README.md
 │
 ├── data/
+
 │ ├── story.txt
+
 │ ├── backstory.txt
+
 │ └── dataset.csv # (optional, for evaluation)
+
 │
 └── src/
+
 ├── pipeline.py # Orchestrates the full pipeline
+
 ├── retrieve.py # Semantic retrieval
+
 ├── judge.py # NLI-based consistency checking
+
 └── io.py # Data loading, saving, accuracy computation
+
 
 
 ---
@@ -141,21 +153,6 @@ Track: NLP / Consistency Detection
 
 Submission Type: Code + Model-based Approach
 
-📄 License
-
-This project is submitted strictly for academic evaluation under KDSH 2026.
 
 
----
 
-## ✅ What to Do Next
-
-1. Copy everything above  
-2. Paste into `README.md`  
-3. Save → commit → push  
-
-If you want, I can:
-- shorten this to **1-page format**
-- align wording **exactly with PS**
-- add **results table**
-- rewrite it in **competition-winning tone**
