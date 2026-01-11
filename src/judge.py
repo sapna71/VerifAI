@@ -5,7 +5,9 @@ from transformers import pipeline
 _nli = pipeline(
     "text-classification",
     model="roberta-large-mnli",
-    return_all_scores=True
+    return_all_scores=True,
+    truncation=True,
+    max_length=512
 )
 
 
