@@ -57,27 +57,27 @@ kdsh_2026/
 
 │
 ├── main.py # Entry point
-|
+
 ├── requirements.txt
-|
+
 ├── README.md
-│
+
 ├── data/
-|
+
 │ ├── story.txt
 
 │ ├── backstory.txt
 
 │ └── dataset.csv # (optional, for evaluation)
-│
+
 └── src/
 
 ├── pipeline.py # Orchestrates the full pipeline
-|
+
 ├── retrieve.py # Semantic retrieval
-|
+
 ├── judge.py # NLI-based consistency checking
-|
+
 └── io.py # Data loading, saving, accuracy computation
 
 
