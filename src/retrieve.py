@@ -1,9 +1,13 @@
 from sentence_transformers import SentenceTransformer, util
 import numpy as np
+from src.store import chunks_to_table
 
 
 # Load embedding model once
 _model = SentenceTransformer("all-MiniLM-L6-v2")
+
+def cosine_sim(a, b):
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
 def build_story_index(story_text):
     words = story_text.split()
@@ -15,10 +19,16 @@ def build_story_index(story_text):
 
     # Embed
     chunk_embeddings = _model.encode(chunks, convert_to_tensor=True)
-    return chunks, chunk_embeddings
+    chunk_data = [
+        {"chunk_id": i, "text": c, "embedding": emb.tolist()}
+        for i, (c, emb) in enumerate(zip(chunks, chunk_embeddings))
+    ]
+
+    pw_table = chunks_to_table(chunk_data)
+    return pw_table
 
 
-def retrieve_chunks(query, chunks, chunk_embeddings, top_k=5):
+def retrieve_chunks(query, pw_table, top_k=5):
     """
     Simple retrieval:
     - Split story into chunks
@@ -26,11 +36,15 @@ def retrieve_chunks(query, chunks, chunk_embeddings, top_k=5):
     - Return top-k most similar chunks (as strings)
     """
 
-    query_embedding = _model.encode(query, convert_to_tensor=True)
+    query_emb = _model.encode(query)
+    df = pw_table.to_pandas() 
+
+    df["score"] = df["embedding"].apply(
+        lambda e: cosine_sim(np.array(e), query_emb)
+    )
 
     # Similarity
-    scores = util.cos_sim(query_embedding, chunk_embeddings)[0]
-    top_indices = scores.topk(k=min(top_k, len(chunks))).indices.tolist()
+    top_df = df.sort_values("score", ascending=False).head(top_k)
+    retrieved_texts = top_df["text"].tolist()
 
-    # Return TEXT ONLY
-    return [chunks[i] for i in top_indices]
+    return retrieved_texts

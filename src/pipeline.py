@@ -18,7 +18,7 @@ def run_pipeline(story_index, backstory_text):
     - Judge each claim
     - Aggregate into final decision
     """
-    chunks, embeddings = story_index
+    pw_table = story_index
     claims = split_into_claims(backstory_text)
 
     claim_results = []
@@ -26,7 +26,7 @@ def run_pipeline(story_index, backstory_text):
 
     for claim in claims:
         # Retrieve relevant chunks for this claim
-        retrieved_chunks = retrieve_chunks(claim, chunks, embeddings)
+        retrieved_chunks = retrieve_chunks(claim, pw_table)
 
         # Judge consistency of this claim
         label, rationale, confidence = judge_consistency(claim, retrieved_chunks)
