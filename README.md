@@ -64,21 +64,21 @@ kdsh_2026/
 
 ├── data/
 
-│ ├── story.txt
+	 ├── story.txt
 
-│ ├── backstory.txt
+	 ├── backstory.txt
 
-│ └── dataset.csv # (optional, for evaluation)
+	 └── dataset.csv # (optional, for evaluation)
 
 └── src/
 
-├── pipeline.py # Orchestrates the full pipeline
+	├── pipeline.py # Orchestrates the full pipeline
 
-├── retrieve.py # Semantic retrieval
+	├── retrieve.py # Semantic retrieval
 
-├── judge.py # NLI-based consistency checking
+	├── judge.py # NLI-based consistency checking
 
-└── io.py # Data loading, saving, accuracy computation
+	└── io.py # Data loading, saving, accuracy computation
 
 
 
