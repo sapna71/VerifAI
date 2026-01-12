@@ -1,5 +1,4 @@
 import pandas as pd
-# src/io.py
 
 def load_dataset(path):
     df=pd.read_csv(path)

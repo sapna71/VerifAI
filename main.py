@@ -4,15 +4,14 @@ from src.retrieve import build_story_index
 import os
 
 def main():
-    #story = load_story("data/story_001.txt")
-    #backstory = load_backstory("data/backstory_001.txt")
+    
     if os.path.exists("outputs/results.csv"):
         os.remove("outputs/results.csv")
 
-    if os.path.exists("data/train.csv"):
-        df=load_dataset("data/train.csv")
+    if os.path.exists("data/test.csv"):
+        df=load_dataset("data/test.csv")
     else:
-        raise FileNotFoundError("train.csv")
+        raise FileNotFoundError("test.csv")
     
     story_cache = {}
     
@@ -32,10 +31,9 @@ def main():
         label, rationale = run_pipeline(story_index, row.content)
         save_result(row.id,label,rationale)
 
-    print("Accuracy: ",calc_accuracy("data/train.csv","outputs/results.csv"))
+    #print("Accuracy: ",calc_accuracy("data/train.csv","outputs/results.csv"))
 
-    #print("Prediction:", label)
-    #print("Rationale:", rationale)
+    
 
 if __name__ == "__main__":
     main()
